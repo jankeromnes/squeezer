@@ -1,0 +1,21 @@
+ports:
+- port: 4001
+  onOpen: ignore
+- port: 4002
+  onOpen: ignore
+tasks:
+- before: npm link
+  init: >
+    npm install &&
+    cd /workspace &&
+    sqz create --project my-first-project --template https://github.com/SqueezerIO/squeezer-2way-payment
+    cd my-first-project &&
+    sqz install &&
+    sqz compile
+  command: >
+    cd /workspace/my-first-project &&
+    sqz serve
+- openMode: split-right
+  command: >
+    while ! nc -z localhost 4002; do sleep 1 ; done &&
+    gp preview "$(gp url 4002)swagger-ui"
